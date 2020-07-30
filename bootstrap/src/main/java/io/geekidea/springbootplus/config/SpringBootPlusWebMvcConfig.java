@@ -24,6 +24,7 @@ import io.geekidea.springbootplus.framework.core.filter.RequestDetailFilter;
 import io.geekidea.springbootplus.framework.core.interceptor.PermissionInterceptor;
 import io.geekidea.springbootplus.framework.core.xss.XssFilter;
 import io.geekidea.springbootplus.framework.util.IniUtil;
+import io.geekidea.springbootplus.handler.SysUserArgumentResolver;
 import io.geekidea.springbootplus.system.interceptor.DownloadInterceptor;
 import io.geekidea.springbootplus.system.interceptor.ResourceInterceptor;
 import io.geekidea.springbootplus.system.interceptor.UploadInterceptor;
@@ -33,11 +34,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +58,9 @@ public class SpringBootPlusWebMvcConfig implements WebMvcConfigurer {
      */
     @Autowired
     private SpringBootPlusProperties springBootPlusProperties;
+
+    @Autowired
+    private SysUserArgumentResolver sysUserArgumentResolver;
 
     /**
      * Filter配置
@@ -139,6 +145,12 @@ public class SpringBootPlusWebMvcConfig implements WebMvcConfigurer {
     @Bean
     public DownloadInterceptor downloadInterceptor() {
         return new DownloadInterceptor();
+    }
+
+    @Override
+    public void addArgumentResolvers(
+            List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(sysUserArgumentResolver);
     }
 
 

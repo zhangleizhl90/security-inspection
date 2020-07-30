@@ -192,8 +192,8 @@ spring-boot-plus:
       - /actuator/**
       - # 排除首页
       - /,/index.html
-      # 排除测试路径
-      - /hello/world,/fooBar/**,/exampleOrder/**
+      # 排除测试路径 /exampleOrder/**
+      - /hello/world,/fooBar/**
     # 多行字符串权限配置
     filter-chain-definitions: |
       /resource/**=anon

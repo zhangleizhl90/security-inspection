@@ -16,6 +16,7 @@
 
 package io.geekidea.springbootplus.framework.shiro.jwt;
 
+import io.geekidea.springbootplus.config.constant.CommonConstant;
 import io.geekidea.springbootplus.config.properties.JwtProperties;
 import io.geekidea.springbootplus.framework.common.api.ApiCode;
 import io.geekidea.springbootplus.framework.common.api.ApiResult;
@@ -68,7 +69,7 @@ public class JwtFilter extends AuthenticatingFilter {
      * @throws Exception
      */
     @Override
-    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) {
         String token = JwtTokenUtil.getToken();
         if (StringUtils.isBlank(token)) {
             throw new AuthenticationException("token不能为空");
@@ -87,9 +88,9 @@ public class JwtFilter extends AuthenticatingFilter {
 
         String username = JwtUtil.getUsername(token);
         String salt;
-        if (jwtProperties.isSaltCheck()){
+        if (jwtProperties.isSaltCheck()) {
             salt = loginRedisService.getSalt(username);
-        }else{
+        } else {
             salt = jwtProperties.getSecret();
         }
         return JwtToken.build(token, username, salt, jwtProperties.getExpireSecond());
@@ -117,30 +118,9 @@ public class JwtFilter extends AuthenticatingFilter {
         return false;
     }
 
-    /**
-     * 判断是否允许访问
-     *
-     * @param request
-     * @param response
-     * @param mappedValue
-     * @return
-     */
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        String url = WebUtils.toHttp(request).getRequestURI();
-        log.debug("isAccessAllowed url:{}", url);
-        if (this.isLoginRequest(request, response)) {
-            return true;
-        }
-        boolean allowed = false;
-        try {
-            allowed = executeLogin(request, response);
-        } catch (IllegalStateException e) { //not found any token
-            log.error("Token不能为空", e);
-        } catch (Exception e) {
-            log.error("访问错误", e);
-        }
-        return allowed || super.isPermissive(mappedValue);
+    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        return executeLogin(request, response);
     }
 
     /**
@@ -159,6 +139,7 @@ public class JwtFilter extends AuthenticatingFilter {
         log.debug("鉴权成功,token:{},url:{}", token, url);
         // 刷新token
         JwtToken jwtToken = (JwtToken) token;
+        request.setAttribute(CommonConstant.JWT_USERNAME, jwtToken.getUsername());
         HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
         shiroLoginService.refreshToken(jwtToken, httpServletResponse);
         return true;
@@ -176,6 +157,6 @@ public class JwtFilter extends AuthenticatingFilter {
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
         log.error("登录失败，token:" + token + ",error:" + e.getMessage(), e);
-        return false;
+        return true;
     }
 }

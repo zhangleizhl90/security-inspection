@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>com.zhongshe</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>system</artifactId>
         </dependency>
     </dependencies>
 

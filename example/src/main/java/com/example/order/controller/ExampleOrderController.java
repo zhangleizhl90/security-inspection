@@ -18,6 +18,7 @@ package com.example.order.controller;
 
 import com.example.order.entity.ExampleOrder;
 import com.example.order.service.ExampleOrderService;
+import io.geekidea.springbootplus.system.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import com.example.order.param.ExampleOrderPageParam;
 import io.geekidea.springbootplus.framework.common.controller.BaseController;
@@ -102,7 +103,8 @@ public class ExampleOrderController extends BaseController {
     @PostMapping("/getPageList")
     @OperationLog(name = "订单示例分页列表", type = OperationLogType.PAGE)
     @ApiOperation(value = "订单示例分页列表", response = ExampleOrder.class)
-    public ApiResult<Paging<ExampleOrder>> getExampleOrderPageList(@Validated @RequestBody ExampleOrderPageParam exampleOrderPageParam) throws Exception {
+    public ApiResult<Paging<ExampleOrder>> getExampleOrderPageList(@Validated @RequestBody ExampleOrderPageParam exampleOrderPageParam,
+                                                                   SysUser sysUser) throws Exception {
         Paging<ExampleOrder> paging = exampleOrderService.getExampleOrderPageList(exampleOrderPageParam);
         return ApiResult.ok(paging);
     }
