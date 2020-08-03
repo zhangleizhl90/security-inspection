@@ -4,7 +4,7 @@
 server:
   port: 8888
   servlet:
-    context-path: /security-inspection
+    context-path:
   tomcat:
     max-threads: 1000
     min-spare-threads: 30
